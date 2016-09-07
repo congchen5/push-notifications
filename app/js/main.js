@@ -1,11 +1,17 @@
 'use strict';
 
+$(function() {
+
 var API_KEY = 'AIzaSyB4EM_00r6a7_ACyUOvHz-tLhC9KAKcz4E';
 //var SUBSCRIPTION_KEY_1 = 'eO45iVneuac:APA91bHwAINIK5ILInDI9YnzfLWk6b5IfQ9D43wi9yXEUIQH2IROgj4kNPqE1PT3yKkK4UVOwIn3xM-alb5IZ01R40onszbOitiN-2fIUuZR2JB5UH0tcEWa7ycDXsO5BD-EtpCMLmwn'
 //var SUBSCRIPTION_KEY_2 = 'd2ZJdZlYnFY:APA91bEKyUkph6VHKtA1LuDso1pphvxo18o4iNngakLPXwtzykXCH3nk5amgC6WJIuSihWr0HxfAlo_CeiBt0XdFZnARdzQqW-aGBv_muCyGkbuiaGHj_jnsWa14GYcgkrfh3uCrEP3e'
 
-var isEnabled = false;
+var reg;
+var sub;
+var isSubscribed = false;
 var subscriptionEndpoint = null;
+var subscriptionButton = $('#subscriptionButton');
+console.log(subscriptionButton);
 
 if ('serviceWorker' in navigator) {
   console.log('Service Worker is supported.');
@@ -72,3 +78,5 @@ function callAjax() {
     }
   });
 }
+
+});
