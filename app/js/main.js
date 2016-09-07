@@ -6,43 +6,76 @@ var API_KEY = 'AIzaSyB4EM_00r6a7_ACyUOvHz-tLhC9KAKcz4E';
 //var SUBSCRIPTION_KEY_1 = 'eO45iVneuac:APA91bHwAINIK5ILInDI9YnzfLWk6b5IfQ9D43wi9yXEUIQH2IROgj4kNPqE1PT3yKkK4UVOwIn3xM-alb5IZ01R40onszbOitiN-2fIUuZR2JB5UH0tcEWa7ycDXsO5BD-EtpCMLmwn'
 //var SUBSCRIPTION_KEY_2 = 'd2ZJdZlYnFY:APA91bEKyUkph6VHKtA1LuDso1pphvxo18o4iNngakLPXwtzykXCH3nk5amgC6WJIuSihWr0HxfAlo_CeiBt0XdFZnARdzQqW-aGBv_muCyGkbuiaGHj_jnsWa14GYcgkrfh3uCrEP3e'
 
-var reg;
-var sub;
+var registration;
+var subscription;
 var isSubscribed = false;
 var subscriptionEndpoint = null;
 var subscriptionButton = $('#subscriptionButton');
-console.log(subscriptionButton);
+var sendNotificationButton = $('#sendNotificationButton');
 
 if ('serviceWorker' in navigator) {
   console.log('Service Worker is supported.');
-  navigator.serviceWorker.register('sw.js').then(function(registration) {
-    console.log(':^)', registration);
+  navigator.serviceWorker.register('sw.js')
+    .then(function(swRegistration) {
+      registration = swRegistration;
 
-    registration.pushManager.subscribe({
-      userVisibleOnly: true
-    }).then(function(subscription) {
-      console.log('endpoint: ', subscription.endpoint);
-      subscriptionEndpoint = subscription.endpoint;
-    }, function(err) {
-      console.log('Service Worker Subscription Error.');
-      console.log(err);
+      console.log(':^)', registration);
+      subscriptionButton.prop('disabled', false);
+    }).catch(function(err) {
+      console.log(':^(', err);
     });
-  }).catch(function(err) {
-    console.log(':^(', err);
-  });
 }
 
-var el = document.getElementById('toggleButton');
-el.addEventListener('click', function(event) {
-      var buttonEl = event.toElement;
-      console.log('toggleButton clicked: ' + event);
-    }, false);
 
-var el = document.getElementById('sendNotificationButton');
-el.addEventListener('click', function(event) {
-      var buttonEl = event.toElement;
-      sendPushNotificationToGcm();
-    }, false);
+$('#subscriptionButton').on('click', function(event) {
+  if (isSubscribed) {
+    unsubscribe();
+  } else {
+    subscribe();
+  }
+});
+
+
+$('#sendNotificationButton').on('click', function(event) {
+  var buttonEl = event.toElement;
+  sendPushNotificationToGcm();
+});
+
+
+function subscribe() {
+  console.log('Subscribing');
+
+  registration.pushManager.subscribe({
+        userVisibleOnly: true
+      }).then(function(swSubscription) {
+        subscription = swSubscription;
+
+        console.log('Subscribed! Endpoint: ', subscription.endpoint);
+        subscriptionEndpoint = subscription.endpoint;
+
+        sendNotificationButton.prop('disabled', false);
+        subscriptionButton.text('Unsubscribe from Push Notifications');
+        isSubscribed = true;
+      }, function(err) {
+        console.log('Service Worker Subscription Error.');
+        console.log(err);
+      });
+};
+
+function unsubscribe() {
+  console.log('Unsubscribing');
+
+  subscription.unsubscribe().then(function(event) {
+    console.log('Unsubscribed!', event);
+
+    subscriptionButton.text('Subscribe to Push Notifications');
+    sendNotificationButton.prop('disabled', true);
+    isSubscribed = false;
+  }, function(error) {
+    console.log('Errr unsubscribing', error);
+  });
+};
+
 
 function sendPushNotificationToGcm() {
   if (subscriptionEndpoint == null) {
