@@ -40,8 +40,8 @@ self.addEventListener('push', function(event) {
       body: 'The Message',
       icon: 'images/icon.png',
       tag: 'my-tag'
-    });
-  }));
+    })
+  );
 });
 
 self.addEventListener('notificationclick', function(event) {
